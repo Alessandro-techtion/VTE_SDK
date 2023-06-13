@@ -16,32 +16,56 @@
 
     $vtlib_Utils_Log = true;
     global $adb, $table_prefix;
-    VteSession::start();
 
+    //avvia una sessione per l'applicazione.
+    VteSession::start();
+    
+    //imposta il nome del modulo a "Macchine"
     $moduleName='Macchine';
+    //tenta di ottenere un'istanza del modulo "Macchine" dall'applicazione.
     $module= Vtecrm_Module::getInstance($moduleName);
 
     if(!$module){
+        
+        //Viene creato un nuovo oggetto di modulo utilizzando
         $module = new Vtecrm_Module();
+        //Il nome del modulo viene impostato su "Macchine" utilizzando 
         $module->name = $moduleName;
+        //Il modulo viene salvato
         $module->save();
+        //Viene inizializzato il servizio Web del modulo utilizzando 
         $module->initWebservice();
+        //Vengono inizializzate le tabelle del modulo utilizzando
         $module->initTables();
+        //Viene impostata la condivisione predefinita del modulo
         $module->setDefaultSharing('Public_ReadWriteDelete');
+        //Vengono abilitati alcuni strumenti per il modulo (Import, Export, Merge)
         $module->enableTools(Array('Import','Export','Merge'));
+        //Viene ottenuto un'istanza del menu "Inventory" utilizzando
         $menu = Vtecrm_Menu::getInstance('Inventory');
+        //il modulo viene aggiunto al menu utilizzando
         $menu->addModule($module);
-
+        
+        //imposta le voci di lingua per il modulo "Macchine". Viene specificato il nome del modulo ("Macchine") e viene fornito un array che associa le 
+        //traduzioni alle lingue specificate. In questo caso, le traduzioni sono impostate come "Macchine" per l'italiano (it_it) e "Machines" per l'inglese (en_us).
         SDK::setLanguageEntries($module->name, 'Macchine', array('it_it'=>'Macchine','en_us'=>'Machines'));
+        //imposta le voci di lingua per il singolo record del modulo "Macchine"
         SDK::setLanguageEntries($module->name, 'SINGLE_Macchine', array('it_it'=>'Macchina','en_us'=>'Machine'));
-
+        
+        //La riga seguente dichiara un array $panels che contiene un singolo elemento. L'elemento rappresenta un pannello del modulo "Macchine" 
         $panels = array(
             array('module'=>$moduleName, 'label'=>'Macchine')
         );
+        
+        //chiama il metodo create_panels della classe Update e passa l'array $panels come argomento. 
+        //Questo metodo crea i pannelli definiti nell'array nel modulo corrente ("Macchine")
         Update::create_panels($panels);
-
+        
+        //crea un nuovo oggetto di blocco 
         $block = new Vtecrm_Block();
+        //imposta l'etichetta del blocco come 'LBL_MACCHINE_INFORMATION'.
         $block->label = 'LBL_MACCHINE_INFORMATION';
+        //aggiunge il blocco al modulo corrente.
         $module->addBlock($block);
         SDK::setLanguageEntries($module->name, $block->label, array('it_it'=>'Informazioni Macchina','en_us'=>'Machine Details'));
 
@@ -52,7 +76,8 @@
         $block3 = new Vtecrm_Block();
         $block3->label = 'LBL_DESCRIPTION_INFORMATION';
         $module->addBlock($block3);
-
+        
+        //crea un nuovo oggetto di campo 
         $field = new Vtecrm_Field();
         $field->name = 'numero_macchina';
         $field->table = $module->basetable;
@@ -61,7 +86,9 @@
         $field->uitype = 4;
         $field->typeofdata = 'V~O';
         $field->quickcreate = 0;
+        //aggiunge il campo al primo blocco creato in precedenza.
         $block->addField($field);
+        //imposta il campo come identificatore dell'entità nel modulo.
         $module->setEntityIdentifier($field);
 
         $field2 = new Vtecrm_field();
@@ -101,7 +128,8 @@
         $field5->typeofdata = 'V~O';
         $field5->quickcreate = 0;
         $block->addField($field5);
-
+        
+        //Campo obbligatorio
         $field6 = new Vtecrm_Field();
         $field6->name = 'assigned_user_id';
         $field6->table = $table_prefix.'_crmentity';
@@ -112,6 +140,7 @@
         $field6->typeofdata = 'V~M';
         $block->addField($field6);
 
+        //Campo obbligatorio
         $field7 = new Vtecrm_Field();
         $field7->name = 'createdtime';
         $field7->table = $table_prefix.'_crmentity';
@@ -121,7 +150,8 @@
         $field7->displaytype = 2;
         $field7->typeofdata = 'T~O';
         $block->addField($field7);
-
+        
+        //Campo obbligatorio
         $field8 = new Vtecrm_Field();
         $field8->name = 'modifiedtime';
         $field8->table = $table_prefix.'_crmentity';
@@ -133,12 +163,17 @@
         $block->addField($field8);
 
         $module = Vtecrm_Module::getInstance($moduleName);
-
+        
+        //crea un nuovo oggetto di filtro 
         $filter =  new Vtecrm_Filter();
+        //imposta il nome del filtro come 'All'.
         $filter->name = 'All';
+        //imposta il filtro come predefinito
         $filter->isdefault = true;
+        //aggiunge il filtro al modulo corrente.
         $module->addFilter($filter);
-
+        
+        //aggiunge il campo $field con un indice di ordinamento 1 al filtro.
         $filter->addField($field, 1);
         $filter->addField($field2, 2);
         $filter->addField($field4, 3);
